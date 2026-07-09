@@ -1,0 +1,22 @@
+{
+  "name": "fitai",
+  "private": true,
+  "workspaces": [
+    "server",
+    "ai-service",
+    "web"
+  ],
+  "scripts": {
+    "dev": "concurrently -n ai,server,web -c blue,green,magenta \"npm:dev:ai\" \"npm:dev:server\" \"npm:dev:web\"",
+    "start": "concurrently -n ai,server -c blue,green \"npm:start -w ai-service\" \"npm:start -w server\"",
+    "dev:server": "npm run dev -w server",
+    "dev:ai": "npm run dev -w ai-service",
+    "dev:web": "npm run dev -w web",
+    "typecheck": "npm run typecheck -w ai-service && npm run typecheck -w server && npm run typecheck -w web",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}

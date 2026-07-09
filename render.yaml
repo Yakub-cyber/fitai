@@ -1,0 +1,41 @@
+# Blueprint для Render (бесплатный тариф).
+# Поднимает бэкенд FitAI ОДНИМ сервисом: API Gateway (Express, слушает $PORT от Render)
+# + ai-service (внутренний порт 5001) через concurrently. База — внешняя MongoDB Atlas M0.
+#
+# Секреты помечены sync:false и задаются в дашборде Render вручную:
+#   MONGO_URI        — строка подключения Atlas (mongodb+srv://...)
+#   AI_API_KEY       — ключ OpenAI-совместимого провайдера (пусто = mock-режим, бесплатно)
+#   ALLOWED_ORIGINS  — URL фронта на Pages, напр. https://<user>.github.io  (без пути/слэша)
+#
+# ⚠️ Free-инстанс засыпает после ~15 мин простоя: первый запрос будит его ~30-50 сек.
+
+services:
+  - type: web
+    name: fitai-backend
+    runtime: node
+    plan: free
+    rootDir: .
+    buildCommand: npm install --include=dev
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: AI_PORT
+        value: "5001"
+      - key: AI_SERVICE_URL
+        value: http://localhost:5001
+      - key: EMBEDDED_MONGO
+        value: "false"
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: AI_API_KEY
+        sync: false
+      - key: AI_BASE_URL
+        value: https://api.proxyapi.ru/openai/v1
+      - key: AI_MODEL
+        value: gpt-4o-mini
+      - key: ALLOWED_ORIGINS
+        sync: false

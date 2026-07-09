@@ -1,0 +1,98 @@
+/* Панель голосового тренера. Изолирована от styles.css. */
+
+.coach {
+  border: 1px solid var(--accent);
+  border-radius: 14px;
+  padding: 1rem;
+  margin: 0.5rem 0 1.25rem;
+  background: color-mix(in srgb, var(--accent) 6%, var(--card));
+}
+
+.coach-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  margin-bottom: 0.85rem;
+}
+.coach-head .coach-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--muted);
+}
+.coach.is-live .coach-dot {
+  background: var(--success);
+  animation: coach-pulse 1.1s ease-in-out infinite;
+}
+@keyframes coach-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--success) 55%, transparent); }
+  50% { box-shadow: 0 0 0 6px transparent; }
+}
+
+.coach-stage {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-height: 118px;
+}
+.coach-anim {
+  width: 108px;
+  min-width: 108px;
+  height: 108px;
+}
+.coach-body { flex: 1; min-width: 0; }
+
+.coach-phase {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  margin-bottom: 0.15rem;
+}
+.coach-now {
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+.coach-sub { color: var(--muted); font-size: 0.9rem; margin-top: 0.2rem; }
+
+.coach-timer {
+  font-size: 2.6rem;
+  font-weight: 800;
+  color: var(--accent);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.coach-progress {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--border);
+  overflow: hidden;
+  margin: 0.85rem 0 0.75rem;
+}
+.coach-progress > span {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+.coach-controls { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+.coach-note {
+  color: var(--muted);
+  font-size: 0.82rem;
+  margin-top: 0.6rem;
+}
+
+@media (max-width: 480px) {
+  .coach-stage { flex-direction: column; text-align: center; }
+  .coach-anim { margin: 0 auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .coach.is-live .coach-dot { animation: none; }
+}
