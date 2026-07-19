@@ -108,6 +108,33 @@ SERVE_WEB=false
 
 ---
 
+## Схема C — только фронт на GitHub Pages (без сервера)
+
+Самый быстрый и бесплатный путь для демо. Веб-приложение работает полностью в браузере:
+`web/src/api/local.ts` эмулирует API поверх `localStorage`. Данные пользователя —
+у него в браузере, генерация тренировок и планов питания — по шаблонам (порт `ai-service/mock`).
+
+Плюсы: без Atlas, без Render, без ключа AI, без CORS. Минус: генерация не LLM-ная,
+данные не синхронизируются между устройствами (для этого — экспорт/импорт JSON на дашборде).
+
+Пайплайн уже готов в `.github/workflows/deploy.yml`:
+
+1. В `Settings → Pages` выбрать источник **GitHub Actions**.
+2. Опционально задать `Settings → Variables → VITE_API_URL` — тогда фронт пойдёт на реальный
+   бэкенд (схема B), иначе — статичный режим.
+3. `git push origin main` → сайт публикуется на `https://<user>.github.io/<repo>/`.
+
+Локальная проверка сборки под Pages:
+
+```powershell
+$env:VITE_BASE='/fitai/'; npm run build -w web
+```
+
+Плагин `pagesSpaFallback` (в `web/vite.config.ts`) кладёт `404.html` рядом с `index.html`,
+чтобы deep-link `/workouts` не отдавал 404 после F5.
+
+---
+
 ## Чеклист перед деплоем
 
 - [ ] Кластер Atlas создан, `MONGO_URI` рабочий, `EMBEDDED_MONGO=false`

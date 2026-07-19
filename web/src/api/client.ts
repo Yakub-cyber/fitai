@@ -1,7 +1,11 @@
+import { localApi } from './local'
+
 const TOKEN_KEY = 'fitai_token'
 
-// В проде, если фронт и API на разных доменах — задать VITE_API_URL (без слэша на конце).
-// Пусто => относительный /api (dev через Vite-прокси или один домен в проде).
+// Режим работы:
+//  • VITE_API_URL задан  → ходим на реальный бэкенд (server на другом домене).
+//  • VITE_API_URL пуст   → статичный режим: локальный «бэкенд» в браузере (localStorage).
+//    Так сайт полностью работает на GitHub Pages без сервера.
 const API_BASE = import.meta.env.VITE_API_URL ?? ''
 
 export function getToken(): string | null {
@@ -19,9 +23,16 @@ interface ApiOptions {
 }
 
 export async function api<T>(path: string, options: ApiOptions = {}): Promise<T> {
+  const method = options.method ?? (options.body !== undefined ? 'POST' : 'GET')
+
+  // Статичный режим: без сервера, всё считает браузер.
+  if (!API_BASE) {
+    return localApi(path, method, options.body) as Promise<T>
+  }
+
   const token = getToken()
   const res = await fetch(`${API_BASE}/api${path}`, {
-    method: options.method ?? (options.body !== undefined ? 'POST' : 'GET'),
+    method,
     headers: {
       'Content-Type': 'application/json',
       ...(token ? { Authorization: `Bearer ${token}` } : {}),

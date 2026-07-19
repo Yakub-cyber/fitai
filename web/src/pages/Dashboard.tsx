@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../api/client'
 import type { LogEntry, Stats, WorkoutDoc } from '../api/types'
+import { DataExport } from '../components/DataExport'
 import { Skeleton } from '../components/Skeleton'
 import { WeightChart } from '../components/WeightChart'
 import { useAuth } from '../context/AuthContext'
@@ -94,6 +95,8 @@ export function Dashboard() {
           </form>
           {message && <p className="form-hint">{message}</p>}
         </div>
+
+        <DataExport />
 
         <div className="card">
           <h3>Сегодняшняя тренировка</h3>
