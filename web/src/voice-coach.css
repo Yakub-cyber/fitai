@@ -1,11 +1,16 @@
-/* Панель голосового тренера. Изолирована от styles.css. */
+/* Панель тренера. Без голоса: fade-in текст и круговой таймер отдыха. */
 
 .coach {
-  border: 1px solid var(--accent);
-  border-radius: 14px;
-  padding: 1rem;
+  position: relative;
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--border));
+  border-radius: 16px;
+  padding: 1.1rem;
   margin: 0.5rem 0 1.25rem;
-  background: color-mix(in srgb, var(--accent) 6%, var(--card));
+  background:
+    radial-gradient(120% 100% at 100% 0%, color-mix(in srgb, var(--accent-3) 8%, transparent), transparent 60%),
+    radial-gradient(120% 100% at 0% 100%, color-mix(in srgb, var(--accent-2) 8%, transparent), transparent 60%),
+    color-mix(in srgb, var(--accent) 5%, var(--card));
+  overflow: hidden;
 }
 
 .coach-head {
@@ -14,75 +19,6 @@
   gap: 0.5rem;
   font-weight: 700;
   margin-bottom: 0.85rem;
-}
-.coach-settings-btn {
-  margin-left: auto;
-  background: none;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  width: 28px;
-  height: 28px;
-  cursor: pointer;
-  font-size: 0.95rem;
-  color: var(--muted);
-  transition: color 0.15s, border-color 0.15s, background 0.15s;
-}
-.coach-settings-btn:hover {
-  color: var(--accent);
-  border-color: var(--accent);
-  background: color-mix(in srgb, var(--accent) 8%, transparent);
-}
-
-.coach-settings {
-  margin-bottom: 0.85rem;
-  padding: 0.85rem;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: color-mix(in srgb, var(--card) 60%, transparent);
-  display: flex;
-  flex-direction: column;
-  gap: 0.7rem;
-}
-.coach-settings label {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-  font-size: 0.85rem;
-  color: var(--muted);
-  margin: 0;
-}
-.coach-settings label > span {
-  font-weight: 600;
-  color: var(--text);
-}
-.coach-settings select {
-  margin-top: 0;
-  padding: 0.4rem 0.55rem;
-  font-size: 0.9rem;
-}
-.coach-sliders {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.7rem;
-}
-.coach-sliders input[type='range'] {
-  padding: 0;
-  height: 24px;
-  accent-color: var(--accent);
-  background: none;
-  border: none;
-  box-shadow: none;
-}
-.coach-sliders input[type='range']:focus {
-  box-shadow: none;
-}
-.coach-settings-actions {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-@media (max-width: 480px) {
-  .coach-sliders { grid-template-columns: 1fr; }
 }
 .coach-head .coach-dot {
   width: 9px;
@@ -98,40 +34,152 @@
   0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--success) 55%, transparent); }
   50% { box-shadow: 0 0 0 6px transparent; }
 }
+.coach-settings-btn {
+  margin-left: auto;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.coach-settings-btn:hover {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
 
 .coach-stage {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  min-height: 118px;
+  gap: 1.1rem;
+  min-height: 152px;
 }
 .coach-anim {
-  width: 108px;
-  min-width: 108px;
-  height: 108px;
+  width: 140px;
+  min-width: 140px;
+  height: 140px;
 }
-.coach-body { flex: 1; min-width: 0; }
+.coach-body {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  min-height: 128px;
+  display: flex;
+  align-items: center;
+}
 
-.coach-phase {
-  font-size: 0.78rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--muted);
-  margin-bottom: 0.15rem;
+/* Плавно всплывающий текст (≤ 3 строки) */
+.coach-msg {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  transition: opacity 0.35s ease, transform 0.5s ease;
 }
+.coach-msg.is-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+.coach-msg.is-out {
+  opacity: 0;
+  transform: translateY(6px);
+}
+.coach-msg-line {
+  line-height: 1.35;
+  animation: coach-msg-line 0.6s cubic-bezier(.2,.7,.2,1) both;
+}
+.coach-msg-line--0 {
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  background: var(--gradient-accent);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation-delay: 0s;
+}
+.coach-msg-line--1 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text);
+  animation-delay: 0.08s;
+}
+.coach-msg-line--2 {
+  font-size: 0.92rem;
+  color: var(--muted);
+  animation-delay: 0.16s;
+}
+@keyframes coach-msg-line {
+  from { opacity: 0; transform: translateY(10px); filter: blur(3px); }
+  to { opacity: 1; transform: translateY(0); filter: none; }
+}
+
 .coach-now {
-  font-size: 1.15rem;
+  font-size: 1.2rem;
   font-weight: 700;
   line-height: 1.25;
 }
-.coach-sub { color: var(--muted); font-size: 0.9rem; margin-top: 0.2rem; }
+.coach-sub {
+  color: var(--muted);
+  font-size: 0.92rem;
+  margin-top: 0.3rem;
+}
 
-.coach-timer {
-  font-size: 2.6rem;
-  font-weight: 800;
-  color: var(--accent);
-  line-height: 1;
+/* Красивый круговой таймер отдыха */
+.coach-timer-wrap {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0;
+}
+.coach-ring {
+  width: 132px;
+  height: 132px;
+  transform: rotate(-90deg);
+  filter: drop-shadow(0 6px 22px color-mix(in srgb, var(--accent) 40%, transparent));
+}
+.coach-ring-bg {
+  fill: none;
+  stroke: color-mix(in srgb, var(--accent) 15%, var(--border));
+  stroke-width: 8;
+}
+.coach-ring-fg {
+  fill: none;
+  stroke-width: 8;
+  stroke-linecap: round;
+}
+.coach-timer-num {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, calc(-50% - 8px));
+  font-size: 3rem;
+  font-weight: 900;
   font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  background: var(--gradient-accent);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  line-height: 1;
+  animation: coach-timer-pulse 1s ease-in-out infinite;
+}
+@keyframes coach-timer-pulse {
+  0%, 100% { transform: translate(-50%, calc(-50% - 8px)) scale(1); }
+  50% { transform: translate(-50%, calc(-50% - 8px)) scale(1.04); }
+}
+.coach-timer-cap {
+  margin-top: 0.35rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+  text-align: center;
+  max-width: 240px;
+  line-height: 1.35;
 }
 
 .coach-progress {
@@ -144,9 +192,10 @@
 .coach-progress > span {
   display: block;
   height: 100%;
-  background: var(--accent);
+  background: var(--gradient-accent);
   border-radius: 999px;
   transition: width 0.4s ease;
+  box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 55%, transparent);
 }
 
 .coach-controls { display: flex; flex-wrap: wrap; gap: 0.5rem; }
@@ -157,11 +206,16 @@
   margin-top: 0.6rem;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 520px) {
   .coach-stage { flex-direction: column; text-align: center; }
   .coach-anim { margin: 0 auto; }
+  .coach-msg { align-items: center; text-align: center; }
+  .coach-body { align-items: flex-start; min-height: 100px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .coach.is-live .coach-dot { animation: none; }
+  .coach.is-live .coach-dot,
+  .coach-msg-line,
+  .coach-timer-num { animation: none !important; }
+  .coach-msg { transition: opacity 0.15s; transform: none; }
 }
