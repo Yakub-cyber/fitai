@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { WorkoutPlan } from '../api/types'
 import { ExerciseAnimation } from './ExerciseAnimation'
 import '../voice-coach.css'
@@ -9,6 +9,60 @@ import '../voice-coach.css'
 type Phase = 'idle' | 'intro' | 'exercise' | 'await' | 'rest' | 'outro' | 'done'
 
 const supported = typeof window !== 'undefined' && 'speechSynthesis' in window
+const SETTINGS_KEY = 'fitai_coach_voice'
+
+// Ранжирование русских голосов. Чем выше индекс регэкспа — тем приятнее (по опыту).
+// Google / Yandex / Neural / Enhanced — почти всегда качественнее, чем базовые SAPI.
+const VOICE_QUALITY: RegExp[] = [
+  /google/i,
+  /yandex/i,
+  /neural|natural|enhanced|premium/i,
+  /milena/i, // macOS/iOS женский
+  /katya|ekaterina|irina|marina|alena|dariya/i, // женские Microsoft
+  /pavel|yuri|maxim|dmitri/i, // мужские Microsoft/macOS
+  /microsoft/i,
+]
+
+function ruVoices(): SpeechSynthesisVoice[] {
+  if (!supported) return []
+  return window.speechSynthesis
+    .getVoices()
+    .filter((v) => /^ru/i.test(v.lang))
+    .sort((a, b) => voiceScore(b) - voiceScore(a))
+}
+
+function voiceScore(v: SpeechSynthesisVoice): number {
+  for (let i = 0; i < VOICE_QUALITY.length; i++) {
+    if (VOICE_QUALITY[i].test(v.name)) return VOICE_QUALITY.length - i
+  }
+  return 0
+}
+
+interface Settings {
+  voiceName: string | null
+  rate: number
+  pitch: number
+}
+
+const DEFAULT_SETTINGS: Settings = { voiceName: null, rate: 0.95, pitch: 1.05 }
+
+function loadSettings(): Settings {
+  try {
+    const raw = localStorage.getItem(SETTINGS_KEY)
+    if (!raw) return DEFAULT_SETTINGS
+    return { ...DEFAULT_SETTINGS, ...JSON.parse(raw) }
+  } catch {
+    return DEFAULT_SETTINGS
+  }
+}
+
+function saveSettings(s: Settings): void {
+  try {
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(s))
+  } catch {
+    /* ignore */
+  }
+}
 
 function plural(n: number, one: string, few: string, many: string): string {
   const mod10 = n % 10
@@ -21,47 +75,79 @@ function plural(n: number, one: string, few: string, many: string): string {
 export function WorkoutCoach({ plan }: { plan: WorkoutPlan }) {
   const exercises = plan.exercises
   const [phase, setPhase] = useState<Phase>('idle')
-  const [cursor, setCursor] = useState(0) // индекс текущего упражнения
+  const [cursor, setCursor] = useState(0)
   const [restLeft, setRestLeft] = useState(0)
   const [paused, setPaused] = useState(false)
+  const [showSettings, setShowSettings] = useState(false)
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([])
+  const [settings, setSettings] = useState<Settings>(() => (supported ? loadSettings() : DEFAULT_SETTINGS))
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const pausedRef = useRef(false)
-  const voiceRef = useRef<SpeechSynthesisVoice | null>(null)
 
   const clearTimer = () => {
     if (timerRef.current) clearInterval(timerRef.current)
     timerRef.current = null
   }
 
-  // Подбираем русский голос (список подгружается асинхронно)
+  // Подгружаем список русских голосов (loadVoices у некоторых браузеров асинхронный).
   useEffect(() => {
     if (!supported) return
-    const pick = () => {
-      const voices = window.speechSynthesis.getVoices()
-      voiceRef.current =
-        voices.find((v) => /ru[-_]?RU/i.test(v.lang)) ??
-        voices.find((v) => /^ru/i.test(v.lang)) ??
-        null
-    }
-    pick()
-    window.speechSynthesis.addEventListener('voiceschanged', pick)
-    return () => window.speechSynthesis.removeEventListener('voiceschanged', pick)
+    const refresh = () => setVoices(ruVoices())
+    refresh()
+    window.speechSynthesis.addEventListener('voiceschanged', refresh)
+    return () => window.speechSynthesis.removeEventListener('voiceschanged', refresh)
   }, [])
 
-  const speak = useCallback((text: string, onEnd?: () => void) => {
-    if (!supported) {
-      onEnd?.()
-      return
-    }
-    const u = new SpeechSynthesisUtterance(text)
-    u.lang = 'ru-RU'
-    if (voiceRef.current) u.voice = voiceRef.current
-    u.rate = 1
-    u.pitch = 1
-    if (onEnd) u.onend = () => onEnd()
-    window.speechSynthesis.speak(u)
-  }, [])
+  // Автовыбор лучшего голоса, если пользователь ещё не выбирал.
+  useEffect(() => {
+    if (!supported || settings.voiceName || voices.length === 0) return
+    const best = voices[0]
+    setSettings((s) => ({ ...s, voiceName: best.name }))
+  }, [voices, settings.voiceName])
+
+  const currentVoice = useMemo(
+    () => voices.find((v) => v.name === settings.voiceName) ?? voices[0] ?? null,
+    [voices, settings.voiceName],
+  )
+
+  const speak = useCallback(
+    (text: string, onEnd?: () => void) => {
+      if (!supported) {
+        onEnd?.()
+        return
+      }
+      const u = new SpeechSynthesisUtterance(text)
+      u.lang = 'ru-RU'
+      if (currentVoice) u.voice = currentVoice
+      u.rate = settings.rate
+      u.pitch = settings.pitch
+      if (onEnd) u.onend = () => onEnd()
+      window.speechSynthesis.speak(u)
+    },
+    [currentVoice, settings.rate, settings.pitch],
+  )
+
+  const previewVoice = useCallback(
+    (voice: SpeechSynthesisVoice) => {
+      window.speechSynthesis.cancel()
+      const u = new SpeechSynthesisUtterance('Привет! Я твой тренер. Начнём тренировку — сделай десять приседаний.')
+      u.lang = 'ru-RU'
+      u.voice = voice
+      u.rate = settings.rate
+      u.pitch = settings.pitch
+      window.speechSynthesis.speak(u)
+    },
+    [settings.rate, settings.pitch],
+  )
+
+  const updateSettings = (patch: Partial<Settings>) => {
+    setSettings((s) => {
+      const next = { ...s, ...patch }
+      saveSettings(next)
+      return next
+    })
+  }
 
   const exerciseText = (i: number): string => {
     const ex = exercises[i]
@@ -69,7 +155,6 @@ export function WorkoutCoach({ plan }: { plan: WorkoutPlan }) {
     return `Упражнение ${i + 1} из ${exercises.length}. ${ex.name}. ${sets} по ${ex.reps}. ${ex.description}`
   }
 
-  // Полная остановка и сброс
   const stop = useCallback(() => {
     clearTimer()
     if (supported) window.speechSynthesis.cancel()
@@ -80,7 +165,6 @@ export function WorkoutCoach({ plan }: { plan: WorkoutPlan }) {
     setRestLeft(0)
   }, [])
 
-  // Переход к упражнению i (или к заминке, если упражнения кончились)
   const goExercise = useCallback(
     (i: number) => {
       clearTimer()
@@ -135,7 +219,6 @@ export function WorkoutCoach({ plan }: { plan: WorkoutPlan }) {
     speak(`${plan.title}. Разминка. ${plan.warmup}`, () => goExercise(0))
   }, [goExercise, plan.title, plan.warmup, speak])
 
-  // Пользователь выполнил упражнение → к отдыху (или к заминке, если последнее)
   const doneSet = useCallback(() => {
     if (cursor >= exercises.length - 1) goExercise(cursor + 1)
     else startRest(cursor)
@@ -156,7 +239,6 @@ export function WorkoutCoach({ plan }: { plan: WorkoutPlan }) {
     else window.speechSynthesis.resume()
   }, [])
 
-  // Чистка при размонтировании
   useEffect(() => {
     return () => {
       clearTimer()
@@ -186,7 +268,83 @@ export function WorkoutCoach({ plan }: { plan: WorkoutPlan }) {
       <div className="coach-head">
         <span className="coach-dot" />
         🎙️ Голосовой тренер
+        <button
+          className="coach-settings-btn"
+          onClick={() => setShowSettings((v) => !v)}
+          title="Настройки голоса"
+          type="button"
+        >
+          ⚙
+        </button>
       </div>
+
+      {showSettings && (
+        <div className="coach-settings">
+          <label>
+            <span>Голос {voices.length === 0 && '(загружается…)'}</span>
+            <select
+              value={settings.voiceName ?? ''}
+              onChange={(e) => updateSettings({ voiceName: e.target.value })}
+            >
+              {voices.length === 0 && <option value="">— системный —</option>}
+              {voices.map((v) => (
+                <option key={v.name} value={v.name}>
+                  {v.name} {v.localService ? '' : '· облако'}
+                </option>
+              ))}
+            </select>
+          </label>
+          <div className="coach-sliders">
+            <label>
+              <span>Темп: {settings.rate.toFixed(2)}×</span>
+              <input
+                type="range"
+                min="0.7"
+                max="1.3"
+                step="0.05"
+                value={settings.rate}
+                onChange={(e) => updateSettings({ rate: Number(e.target.value) })}
+              />
+            </label>
+            <label>
+              <span>Тональность: {settings.pitch.toFixed(2)}</span>
+              <input
+                type="range"
+                min="0.7"
+                max="1.4"
+                step="0.05"
+                value={settings.pitch}
+                onChange={(e) => updateSettings({ pitch: Number(e.target.value) })}
+              />
+            </label>
+          </div>
+          <div className="coach-settings-actions">
+            <button
+              className="btn btn-ghost btn-sm"
+              type="button"
+              disabled={!currentVoice}
+              onClick={() => currentVoice && previewVoice(currentVoice)}
+            >
+              🔊 Прослушать
+            </button>
+            <button
+              className="btn btn-ghost btn-sm"
+              type="button"
+              onClick={() => {
+                saveSettings(DEFAULT_SETTINGS)
+                setSettings({ ...DEFAULT_SETTINGS, voiceName: voices[0]?.name ?? null })
+              }}
+            >
+              Сбросить
+            </button>
+          </div>
+          {voices.length === 0 && (
+            <p className="coach-note">
+              В системе не найден русский голос. На Windows: Параметры → Время и язык → Речь → добавить русский. На Android — Google Speech Services.
+            </p>
+          )}
+        </div>
+      )}
 
       <div className="coach-stage">
         <div className="coach-anim">

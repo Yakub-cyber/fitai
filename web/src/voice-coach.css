@@ -15,6 +15,75 @@
   font-weight: 700;
   margin-bottom: 0.85rem;
 }
+.coach-settings-btn {
+  margin-left: auto;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: var(--muted);
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.coach-settings-btn:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+
+.coach-settings {
+  margin-bottom: 0.85rem;
+  padding: 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--card) 60%, transparent);
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+.coach-settings label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin: 0;
+}
+.coach-settings label > span {
+  font-weight: 600;
+  color: var(--text);
+}
+.coach-settings select {
+  margin-top: 0;
+  padding: 0.4rem 0.55rem;
+  font-size: 0.9rem;
+}
+.coach-sliders {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.7rem;
+}
+.coach-sliders input[type='range'] {
+  padding: 0;
+  height: 24px;
+  accent-color: var(--accent);
+  background: none;
+  border: none;
+  box-shadow: none;
+}
+.coach-sliders input[type='range']:focus {
+  box-shadow: none;
+}
+.coach-settings-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+@media (max-width: 480px) {
+  .coach-sliders { grid-template-columns: 1fr; }
+}
 .coach-head .coach-dot {
   width: 9px;
   height: 9px;
