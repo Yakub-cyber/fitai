@@ -50,6 +50,67 @@
   background: color-mix(in srgb, var(--accent) 10%, transparent);
 }
 
+.coach-settings {
+  margin-bottom: 0.85rem;
+  padding: 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--card) 65%, transparent);
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+.coach-settings label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin: 0;
+}
+.coach-settings label > span {
+  font-weight: 600;
+  color: var(--text);
+}
+.coach-settings select {
+  margin-top: 0;
+  padding: 0.4rem 0.55rem;
+  font-size: 0.9rem;
+}
+.coach-toggle {
+  flex-direction: row !important;
+  align-items: center;
+  gap: 0.55rem !important;
+  cursor: pointer;
+}
+.coach-toggle input {
+  width: auto;
+  margin: 0;
+  accent-color: var(--accent);
+}
+.coach-sliders {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.7rem;
+}
+.coach-sliders input[type='range'] {
+  padding: 0;
+  height: 24px;
+  accent-color: var(--accent);
+  background: none;
+  border: none;
+  box-shadow: none;
+}
+.coach-sliders input[type='range']:focus { box-shadow: none; }
+.coach-settings-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+@media (max-width: 480px) {
+  .coach-sliders { grid-template-columns: 1fr; }
+}
+
 .coach-stage {
   display: flex;
   align-items: center;
