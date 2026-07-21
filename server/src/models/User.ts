@@ -9,6 +9,9 @@ export interface IUser {
   height?: number
   fitnessLevel: 'beginner' | 'intermediate' | 'advanced'
   goal: string
+  telegramId?: number
+  telegramLinkCode?: string
+  telegramLinkCodeExpiresAt?: Date
 }
 
 const userSchema = new Schema<IUser>(
@@ -25,12 +28,20 @@ const userSchema = new Schema<IUser>(
       default: 'beginner',
     },
     goal: { type: String, default: 'Поддержание формы' },
+    // Telegram: числовой user id (unique+sparse — один telegram = один аккаунт).
+    telegramId: { type: Number, unique: true, sparse: true, index: true },
+    // Одноразовый 6-значный код для связки (генерирует веб/RN, вводит в бот).
+    // Живёт короткое время (~10 мин), sparse-индекс — быстрый поиск в боте.
+    telegramLinkCode: { type: String, sparse: true, index: true },
+    telegramLinkCodeExpiresAt: Date,
   },
   {
     timestamps: true,
     toJSON: {
       transform: (_doc: unknown, ret: Record<string, unknown>) => {
         delete ret.passwordHash
+        delete ret.telegramLinkCode
+        delete ret.telegramLinkCodeExpiresAt
         return ret
       },
     },

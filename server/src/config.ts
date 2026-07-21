@@ -17,6 +17,9 @@ export const config = {
   // Чтобы использовать внешнюю БД (например Atlas) — задай EMBEDDED_MONGO=false и MONGO_URI.
   embeddedMongo: (process.env.EMBEDDED_MONGO ?? 'true') !== 'false',
   embeddedDbPath: process.env.EMBEDDED_DB_PATH ?? './data/mongo',
+  // Общий секрет, которым бот доказывает серверу, что запрос от него, а не от кого-то извне.
+  // Пусто = приватные бот-эндпоинты выключены (безопасное поведение по умолчанию).
+  botSharedSecret: process.env.BOT_SHARED_SECRET ?? '',
 }
 
 export const isProd = config.nodeEnv === 'production'

@@ -10,6 +10,7 @@ import { apiLimiter, authLimiter } from './middleware/rateLimit'
 import { authRouter } from './routes/auth'
 import { dietsRouter } from './routes/diets'
 import { logsRouter } from './routes/logs'
+import { telegramRouter } from './routes/telegram'
 import { workoutsRouter } from './routes/workouts'
 
 const app = express()
@@ -30,6 +31,7 @@ app.get('/api/health', (_req, res) => {
 })
 
 app.use('/api/auth', authLimiter, authRouter)
+app.use('/api/telegram', telegramRouter)
 app.use('/api/workouts', workoutsRouter)
 app.use('/api/diets', dietsRouter)
 app.use('/api/logs', logsRouter)
