@@ -1,32 +1,46 @@
 /* ---------- Темы ---------- */
 :root {
-  --bg: #f5f6fa;
+  --bg: #f4f6fb;
+  --bg-tint: #eef2fb;
   --card: #ffffff;
-  --text: #1b1e26;
-  --muted: #6b7280;
-  --accent: #4f7cff;
-  --accent-hover: #3d66e0;
-  --border: #e4e7ef;
-  --danger: #e05252;
-  --success: #2fa964;
-  --skeleton-a: #e8eaf2;
-  --skeleton-b: #f4f5fa;
-  --shadow: 0 1px 3px rgba(20, 24, 40, 0.07);
+  --text: #141826;
+  --muted: #5c6577;
+  --accent: #5b6df6;
+  --accent-hover: #4553e6;
+  --accent-2: #22d3ee;
+  --accent-3: #a855f7;
+  --gradient-accent: linear-gradient(135deg, #5b6df6 0%, #7c5cf6 45%, #22d3ee 100%);
+  --gradient-warm: linear-gradient(135deg, #f472b6 0%, #f97316 100%);
+  --glow: 0 12px 34px -12px rgba(91, 109, 246, 0.55);
+  --glow-strong: 0 18px 48px -14px rgba(124, 92, 246, 0.55);
+  --border: #dfe4f0;
+  --danger: #ef4444;
+  --success: #10b981;
+  --skeleton-a: #e6ebf5;
+  --skeleton-b: #f2f5fb;
+  --shadow: 0 6px 20px -10px rgba(24, 32, 72, 0.12);
 }
 
 [data-theme='dark'] {
-  --bg: #0f1117;
-  --card: #181b24;
-  --text: #e8eaf0;
-  --muted: #9aa1b2;
-  --accent: #6b8cff;
-  --accent-hover: #829eff;
-  --border: #272b38;
-  --danger: #ef6b6b;
-  --success: #45c17d;
-  --skeleton-a: #232735;
-  --skeleton-b: #2b3042;
-  --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --bg: #131826;
+  --bg-tint: #1a2136;
+  --card: #1c2233;
+  --text: #eef1f8;
+  --muted: #9ba4b8;
+  --accent: #8296ff;
+  --accent-hover: #a1b0ff;
+  --accent-2: #38e6f7;
+  --accent-3: #c47dff;
+  --gradient-accent: linear-gradient(135deg, #8296ff 0%, #b280ff 45%, #38e6f7 100%);
+  --gradient-warm: linear-gradient(135deg, #fb7fbf 0%, #ff9a4d 100%);
+  --glow: 0 14px 40px -12px rgba(130, 150, 255, 0.55);
+  --glow-strong: 0 20px 60px -14px rgba(180, 130, 255, 0.55);
+  --border: #2f3547;
+  --danger: #f87171;
+  --success: #34d399;
+  --skeleton-a: #262c3d;
+  --skeleton-b: #2f3549;
+  --shadow: 0 6px 20px -10px rgba(0, 0, 0, 0.5);
 }
 
 /* ---------- База ---------- */
@@ -73,9 +87,16 @@ a:hover { text-decoration: underline; }
 }
 
 .navbar-brand {
-  font-size: 1.25rem;
-  font-weight: 700;
+  font-size: 1.3rem;
+  font-weight: 800;
   color: var(--text);
+  letter-spacing: -0.01em;
+}
+.navbar-brand .accent {
+  background: var(--gradient-accent);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 .navbar-brand:hover { text-decoration: none; }
 
@@ -119,11 +140,31 @@ a:hover { text-decoration: underline; }
 .btn:disabled { opacity: 0.6; cursor: default; }
 .btn:hover { text-decoration: none; }
 
-.btn-primary { background: var(--accent); color: #fff; }
-.btn-primary:not(:disabled):hover { background: var(--accent-hover); }
+.btn-primary {
+  background: var(--gradient-accent);
+  background-size: 180% 180%;
+  color: #fff;
+  border: none;
+  box-shadow: var(--glow);
+  transition: transform 0.18s ease, box-shadow 0.2s ease, background-position 0.35s ease;
+}
+.btn-primary:not(:disabled):hover {
+  transform: translateY(-1px);
+  box-shadow: var(--glow-strong);
+  background-position: 100% 50%;
+}
+.btn-primary:not(:disabled):active { transform: translateY(0); }
 
-.btn-ghost { border-color: var(--border); }
-.btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+.btn-ghost {
+  border-color: var(--border);
+  background: color-mix(in srgb, var(--card) 70%, transparent);
+  backdrop-filter: blur(6px);
+}
+.btn-ghost:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, var(--card));
+}
 
 .btn-danger { color: var(--danger); border-color: transparent; }
 .btn-danger:hover { border-color: var(--danger); }
@@ -155,10 +196,11 @@ a:hover { text-decoration: underline; }
 .card {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 1.25rem;
+  border-radius: 14px;
+  padding: 1.35rem;
   margin-bottom: 1rem;
   box-shadow: var(--shadow);
+  transition: border-color 0.2s, box-shadow 0.25s;
 }
 
 /* ==================== ЛЕНДИНГ ==================== */
@@ -170,14 +212,18 @@ a:hover { text-decoration: underline; }
 }
 
 .badge {
-  display: inline-block;
-  padding: 0.35rem 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.95rem;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
   color: var(--accent);
   font-size: 0.82rem;
-  font-weight: 600;
+  font-weight: 700;
   margin-bottom: 1.1rem;
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 8%, transparent);
 }
 
 .section { padding: 4rem 1.25rem; }
@@ -188,10 +234,38 @@ a:hover { text-decoration: underline; }
 /* ---------- Hero ---------- */
 .hero {
   position: relative;
-  padding: 4rem 0 3.5rem;
+  padding: 4.5rem 0 4rem;
+  overflow: hidden;
   background:
-    radial-gradient(60% 90% at 80% 0%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 60%),
-    radial-gradient(50% 70% at 0% 20%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 55%);
+    radial-gradient(58% 88% at 82% 0%, color-mix(in srgb, var(--accent-2) 26%, transparent), transparent 62%),
+    radial-gradient(60% 80% at 4% 24%, color-mix(in srgb, var(--accent-3) 22%, transparent), transparent 60%),
+    radial-gradient(90% 60% at 50% 100%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 65%);
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: -30%;
+  background: conic-gradient(from 210deg at 70% 30%,
+    color-mix(in srgb, var(--accent) 22%, transparent),
+    color-mix(in srgb, var(--accent-2) 22%, transparent),
+    color-mix(in srgb, var(--accent-3) 22%, transparent),
+    color-mix(in srgb, var(--accent) 22%, transparent));
+  filter: blur(80px);
+  opacity: 0.5;
+  pointer-events: none;
+  animation: hero-swirl 22s linear infinite;
+  z-index: 0;
+}
+.hero-inner { position: relative; z-index: 1; }
+.hero h1 span.accent {
+  background: var(--gradient-accent);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+@keyframes hero-swirl {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 .hero-inner {
   display: grid;
@@ -219,13 +293,29 @@ a:hover { text-decoration: underline; }
 
 /* ---------- Мокап приложения ---------- */
 .mockup {
+  position: relative;
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 16px;
-  box-shadow: 0 30px 60px -20px rgba(20, 24, 60, 0.35);
+  border-radius: 20px;
+  box-shadow:
+    0 40px 90px -30px rgba(20, 24, 60, 0.45),
+    var(--glow-strong);
   overflow: hidden;
   transform: perspective(1200px) rotateY(-6deg) rotateX(2deg);
   animation: mockup-float 6s ease-in-out infinite;
+}
+.mockup::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 20px;
+  padding: 1px;
+  background: var(--gradient-accent);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.55;
+  pointer-events: none;
 }
 .mockup-bar {
   display: flex;
@@ -283,59 +373,116 @@ a:hover { text-decoration: underline; }
 
 /* ---------- Полоса с цифрами ---------- */
 .stats-band {
-  background: linear-gradient(135deg, var(--accent), var(--accent-hover));
-  padding: 2rem 1.25rem;
+  position: relative;
+  background: var(--gradient-accent);
+  padding: 2.5rem 1.25rem;
+  overflow: hidden;
+}
+.stats-band::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(70% 100% at 20% 0%, rgba(255, 255, 255, 0.18), transparent 60%),
+    radial-gradient(60% 100% at 90% 100%, rgba(0, 0, 0, 0.14), transparent 60%);
+  pointer-events: none;
 }
 .stats-band-inner {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 1rem;
   text-align: center;
 }
-.stat-num { font-size: 1.9rem; font-weight: 800; color: #fff; }
-.stat-cap { color: rgba(255, 255, 255, 0.85); font-size: 0.9rem; }
+.stat-num {
+  font-size: 2.1rem;
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.18);
+}
+.stat-cap { color: rgba(255, 255, 255, 0.92); font-size: 0.95rem; }
 
 /* ---------- Шаги ---------- */
 .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
 .step-card {
+  position: relative;
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 1.5rem;
+  border-radius: 16px;
+  padding: 1.75rem 1.5rem 1.5rem;
   box-shadow: var(--shadow);
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.25s;
+  overflow: hidden;
+}
+.step-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--gradient-accent);
+  opacity: 0.7;
+}
+.step-card:hover {
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+  box-shadow: var(--glow);
 }
 .step-n {
-  font-size: 1.6rem;
-  font-weight: 800;
-  color: var(--accent);
-  opacity: 0.6;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-size: 2rem;
+  font-weight: 900;
+  background: var(--gradient-accent);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
   margin-bottom: 0.5rem;
+  letter-spacing: -0.02em;
 }
 .step-card p { color: var(--muted); font-size: 0.95rem; }
 
 /* ---------- Фичи ---------- */
 .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
 .feature-card {
+  position: relative;
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 1.5rem;
+  border-radius: 16px;
+  padding: 1.75rem 1.5rem;
   box-shadow: var(--shadow);
-  transition: transform 0.2s, border-color 0.2s;
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.25s;
+  overflow: hidden;
 }
-.feature-card:hover { transform: translateY(-4px); border-color: var(--accent); }
+.feature-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(120% 80% at 100% 0%, color-mix(in srgb, var(--accent-2) 14%, transparent), transparent 55%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+.feature-card:hover::before { opacity: 1; }
+.feature-card:hover {
+  transform: translateY(-5px);
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+  box-shadow: var(--glow);
+}
 .feature-icon {
-  font-size: 1.7rem;
-  width: 3rem;
-  height: 3rem;
+  position: relative;
+  font-size: 1.8rem;
+  width: 3.2rem;
+  height: 3.2rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--accent) 12%, transparent);
-  margin-bottom: 0.9rem;
+  border-radius: 14px;
+  background: var(--gradient-accent);
+  color: #fff;
+  margin-bottom: 1rem;
+  box-shadow: var(--glow);
 }
-.feature-card p { color: var(--muted); font-size: 0.95rem; margin-top: 0.4rem; }
+.feature-card p { color: var(--muted); font-size: 0.95rem; margin-top: 0.4rem; position: relative; }
+.feature-card h3 { position: relative; }
 
 /* ---------- Отзывы ---------- */
 .testimonials { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
@@ -350,27 +497,49 @@ a:hover { text-decoration: underline; }
 .testimonial blockquote { margin: 0 0 1rem; font-size: 0.98rem; line-height: 1.6; }
 .testimonial figcaption { display: flex; align-items: center; gap: 0.6rem; font-size: 0.9rem; }
 .testimonial-avatar {
-  width: 2.1rem;
-  height: 2.1rem;
+  width: 2.4rem;
+  height: 2.4rem;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--accent);
+  background: var(--gradient-accent);
   color: #fff;
   font-weight: 700;
+  box-shadow: var(--glow);
 }
 
 /* ---------- Тариф ---------- */
 .pricing-card {
+  position: relative;
   display: grid;
   grid-template-columns: 1.4fr 1fr;
   gap: 2rem;
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 18px;
-  padding: 2.25rem;
-  box-shadow: var(--shadow);
+  border-radius: 22px;
+  padding: 2.5rem;
+  box-shadow: var(--glow);
+  overflow: hidden;
+}
+.pricing-card::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 22px;
+  padding: 1px;
+  background: var(--gradient-accent);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.5;
+  pointer-events: none;
+}
+.pricing-price {
+  background: var(--gradient-accent);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 .pricing-list { list-style: none; padding: 0; margin: 1.25rem 0 0; }
 .pricing-list li { padding: 0.4rem 0 0.4rem 1.7rem; position: relative; }
@@ -392,8 +561,14 @@ a:hover { text-decoration: underline; }
   border-radius: 14px;
   padding: 1.5rem;
 }
-.pricing-price { font-size: 2.6rem; font-weight: 800; }
-.pricing-price span { font-size: 1rem; font-weight: 500; color: var(--muted); }
+.pricing-price { font-size: 2.8rem; font-weight: 900; letter-spacing: -0.02em; }
+.pricing-price span {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--muted);
+  background: none;
+  -webkit-text-fill-color: var(--muted);
+}
 .pricing-cta .btn { width: 100%; }
 
 /* ---------- FAQ ---------- */
@@ -420,13 +595,27 @@ a:hover { text-decoration: underline; }
 
 /* ---------- Финальный CTA ---------- */
 .final-cta {
+  position: relative;
   text-align: center;
-  padding: 4rem 1.25rem;
+  padding: 5rem 1.25rem;
+  overflow: hidden;
   background:
-    radial-gradient(60% 120% at 50% 0%, color-mix(in srgb, var(--accent) 20%, transparent), transparent 70%);
+    radial-gradient(65% 130% at 50% 0%, color-mix(in srgb, var(--accent-3) 22%, transparent), transparent 65%),
+    radial-gradient(80% 130% at 50% 100%, color-mix(in srgb, var(--accent-2) 22%, transparent), transparent 60%);
 }
-.final-cta h2 { font-size: 2rem; margin-bottom: 0.6rem; }
-.final-cta p { color: var(--muted); margin-bottom: 1.5rem; }
+.final-cta::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(40% 60% at 20% 40%, color-mix(in srgb, var(--accent) 20%, transparent), transparent 60%),
+    radial-gradient(40% 60% at 80% 60%, color-mix(in srgb, var(--accent-3) 18%, transparent), transparent 60%);
+  filter: blur(30px);
+  pointer-events: none;
+}
+.final-cta > * { position: relative; z-index: 1; }
+.final-cta h2 { font-size: 2.2rem; margin-bottom: 0.6rem; letter-spacing: -0.01em; }
+.final-cta p { color: var(--muted); margin-bottom: 1.5rem; font-size: 1.05rem; }
 
 /* ---------- Футер ---------- */
 .footer { border-top: 1px solid var(--border); padding: 1.75rem 1.25rem; }
@@ -487,6 +676,7 @@ input:focus,
 select:focus {
   outline: none;
   border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
 }
 
 .form-row {
@@ -515,19 +705,25 @@ select:focus {
   margin-bottom: 1rem;
 }
 .chip {
-  padding: 0.4rem 0.9rem;
+  padding: 0.45rem 1rem;
   border: 1px solid var(--border);
   border-radius: 999px;
-  background: var(--bg);
+  background: var(--card);
   color: var(--text);
   cursor: pointer;
   font-size: 0.9rem;
-  transition: all 0.15s;
+  font-weight: 500;
+  transition: all 0.18s;
+}
+.chip:hover {
+  border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
+  color: var(--accent);
 }
 .chip.active {
-  background: var(--accent);
-  border-color: var(--accent);
+  background: var(--gradient-accent);
+  border-color: transparent;
   color: #fff;
+  box-shadow: var(--glow);
 }
 
 /* ---------- Теги продуктов ---------- */
@@ -599,9 +795,29 @@ select:focus {
   gap: 1rem;
   margin-bottom: 1rem;
 }
-.stat-card { margin-bottom: 0; }
+.stat-card {
+  margin-bottom: 0;
+  position: relative;
+  overflow: hidden;
+}
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--gradient-accent);
+  opacity: 0.85;
+}
 .stat-label { color: var(--muted); font-size: 0.85rem; margin-bottom: 0.3rem; }
-.stat-value { font-size: 1.6rem; font-weight: 700; }
+.stat-value {
+  font-size: 1.75rem;
+  font-weight: 800;
+  background: var(--gradient-accent);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  letter-spacing: -0.01em;
+}
 
 .dashboard-grid {
   display: grid;

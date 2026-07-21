@@ -1,15 +1,34 @@
 /* Анимации демонстраций упражнений + карточки упражнений.
-   Держим отдельно от styles.css. Все движения — CSS transforms по суставам
-   (transform-origin задаётся инлайн в компоненте в координатах viewBox). */
+   Все движения — CSS transforms по суставам (transform-origin задаётся
+   инлайн в компоненте в координатах viewBox). Цвета — из темы через
+   градиент #exd-grad, определённый в defs. */
 
-/* ---------- Базовая фигурка ---------- */
-.exdemo { display: block; width: 100%; height: auto; }
-.exd-head { fill: var(--accent); }
-.exd-body {
+/* ---------- Фигурка: базовые части ---------- */
+.exdemo {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.exd-head {
+  fill: url(#exd-grad);
+  filter: drop-shadow(0 2px 4px color-mix(in srgb, var(--accent) 40%, transparent));
+}
+.exd-neck {
   stroke: var(--accent);
-  stroke-width: 6;
+  stroke-width: 3.5;
   fill: none;
   stroke-linecap: round;
+  opacity: 0.85;
+}
+.exd-torso {
+  fill: url(#exd-grad);
+  opacity: 0.9;
+}
+.exd-hub {
+  fill: color-mix(in srgb, var(--accent) 90%, #fff);
+  opacity: 0.85;
 }
 .exd-limb {
   stroke: var(--accent);
@@ -18,126 +37,214 @@
   stroke-linecap: round;
   stroke-linejoin: round;
 }
-.exd-ground { stroke: var(--border); stroke-width: 3; stroke-linecap: round; }
+.exd-joint {
+  fill: color-mix(in srgb, var(--accent) 80%, #fff);
+}
+.exd-ground {
+  stroke: var(--border);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
 .exd-shadow {
-  fill: var(--accent);
-  opacity: 0.12;
   transform-box: view-box;
   transform-origin: 60px 112px;
+  animation: exd-shadowPulse 1.6s ease-in-out infinite;
 }
 .exd { will-change: transform; }
 
-/* ---------- Джампинг-джек ---------- */
+/* Универсальный «пульс тени» */
+@keyframes exd-shadowPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(0.85); opacity: 0.7; }
+}
+
+/* ---------- Джампинг-джек: подскок + широкие махи ---------- */
+.exd-jjBody { animation: exd-jjBounce 1s ease-in-out infinite; transform-box: view-box; transform-origin: 60px 108px; }
 .exd-jjArmL { animation: exd-jjArmL 1s ease-in-out infinite; }
 .exd-jjArmR { animation: exd-jjArmR 1s ease-in-out infinite; }
 .exd-jjLegL { animation: exd-jjLegL 1s ease-in-out infinite; }
 .exd-jjLegR { animation: exd-jjLegR 1s ease-in-out infinite; }
-@keyframes exd-jjArmL { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(160deg); } }
-@keyframes exd-jjArmR { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-160deg); } }
-@keyframes exd-jjLegL { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(16deg); } }
-@keyframes exd-jjLegR { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-16deg); } }
+@keyframes exd-jjBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+@keyframes exd-jjArmL { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(155deg); } }
+@keyframes exd-jjArmR { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-155deg); } }
+@keyframes exd-jjLegL { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(18deg); } }
+@keyframes exd-jjLegR { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-18deg); } }
 
-/* ---------- Присед ---------- */
-.exd-squat { animation: exd-squat 1.6s ease-in-out infinite; }
-@keyframes exd-squat {
-  0%, 100% { transform: translateY(0) scaleY(1); }
-  50% { transform: translateY(4px) scaleY(0.82); }
+/* ---------- Присед: наклон корпуса + сгиб коленей + опускание ---------- */
+.exd-squatDrop { animation: exd-squatDrop 1.8s cubic-bezier(.45,.05,.55,.95) infinite; transform-box: view-box; transform-origin: 60px 106px; }
+.exd-squatTorso { animation: exd-squatTilt 1.8s cubic-bezier(.45,.05,.55,.95) infinite; }
+.exd-squatLegL { animation: exd-squatLegL 1.8s cubic-bezier(.45,.05,.55,.95) infinite; }
+.exd-squatLegR { animation: exd-squatLegR 1.8s cubic-bezier(.45,.05,.55,.95) infinite; }
+@keyframes exd-squatDrop {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(6px); }
+}
+@keyframes exd-squatTilt {
+  0%, 100% { transform: rotate(0); }
+  50% { transform: rotate(10deg); }
+}
+@keyframes exd-squatLegL {
+  0%, 100% { transform: rotate(0); }
+  50% { transform: rotate(-6deg); }
+}
+@keyframes exd-squatLegR {
+  0%, 100% { transform: rotate(0); }
+  50% { transform: rotate(6deg); }
 }
 
-/* ---------- Отжимание ---------- */
-.exd-pushBody { animation: exd-pushBody 1.5s ease-in-out infinite; }
-@keyframes exd-pushBody { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(7deg); } }
+/* ---------- Отжимание: тело опускается, руки сгибаются ---------- */
+.exd-pushBody { animation: exd-pushBody 1.6s cubic-bezier(.45,.05,.55,.95) infinite; transform-box: view-box; transform-origin: 60px 90px; }
+.exd-pushArm { animation: exd-pushArm 1.6s cubic-bezier(.45,.05,.55,.95) infinite; }
+@keyframes exd-pushBody {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(6px); }
+}
+@keyframes exd-pushArm {
+  0%, 100% { transform: none; }
+  50% { transform: translateY(6px) scaleY(0.85); }
+}
 
-/* ---------- Планка (дыхание) ---------- */
-.exd-plank { animation: exd-plank 3.5s ease-in-out infinite; }
-@keyframes exd-plank { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-1.5px); } }
+/* ---------- Планка: дыхание ---------- */
+.exd-plank { animation: exd-plank 3s ease-in-out infinite; transform-box: view-box; transform-origin: 60px 90px; }
+@keyframes exd-plank {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-1.5px) scale(1.008); }
+}
 
-/* ---------- Выпад ---------- */
-.exd-lunge { animation: exd-lunge 1.8s ease-in-out infinite; }
-@keyframes exd-lunge { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(7px); } }
+/* ---------- Выпад: опускание + возврат ---------- */
+.exd-lungeDrop { animation: exd-lungeDrop 2s cubic-bezier(.45,.05,.55,.95) infinite; transform-box: view-box; transform-origin: 60px 106px; }
+@keyframes exd-lungeDrop {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(9px); }
+}
 
-/* ---------- Высокое поднимание колен ---------- */
+/* ---------- Высокое поднимание колен: подскок + противофаза рук/ног ---------- */
+.exd-hkBounce { animation: exd-hkBounce 0.7s ease-in-out infinite; transform-box: view-box; transform-origin: 60px 108px; }
 .exd-hkLegL { animation: exd-hkLegL 0.7s ease-in-out infinite; }
 .exd-hkLegR { animation: exd-hkLegR 0.7s ease-in-out infinite; animation-delay: -0.35s; }
 .exd-hkArmL { animation: exd-hkArmR 0.7s ease-in-out infinite; animation-delay: -0.35s; }
 .exd-hkArmR { animation: exd-hkArmL 0.7s ease-in-out infinite; }
-@keyframes exd-hkLegL { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-40deg); } }
-@keyframes exd-hkLegR { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(40deg); } }
-@keyframes exd-hkArmL { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-24deg); } }
-@keyframes exd-hkArmR { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(24deg); } }
+@keyframes exd-hkBounce {
+  0%, 100% { transform: translateY(0); }
+  25% { transform: translateY(-3px); }
+  75% { transform: translateY(-3px); }
+}
+@keyframes exd-hkLegL {
+  0%, 100% { transform: rotate(0); }
+  50% { transform: rotate(-48deg); }
+}
+@keyframes exd-hkLegR {
+  0%, 100% { transform: rotate(0); }
+  50% { transform: rotate(48deg); }
+}
+@keyframes exd-hkArmL {
+  0%, 100% { transform: rotate(0); }
+  50% { transform: rotate(-32deg); }
+}
+@keyframes exd-hkArmR {
+  0%, 100% { transform: rotate(0); }
+  50% { transform: rotate(32deg); }
+}
 
-/* ---------- Скручивания ---------- */
-.exd-crunchTorso { animation: exd-crunchTorso 1.8s ease-in-out infinite; }
-@keyframes exd-crunchTorso { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(26deg); } }
+/* ---------- Скручивания: корпус поднимается к коленям ---------- */
+.exd-crunchTorso { animation: exd-crunchTorso 1.8s cubic-bezier(.5,.1,.5,.9) infinite; }
+@keyframes exd-crunchTorso {
+  0%, 100% { transform: rotate(0); }
+  50% { transform: rotate(30deg); }
+}
 
-/* ---------- Супермен ---------- */
-.exd-superArm { animation: exd-superArm 2s ease-in-out infinite; }
-.exd-superLeg { animation: exd-superLeg 2s ease-in-out infinite; }
-@keyframes exd-superArm { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(22deg); } }
-@keyframes exd-superLeg { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-22deg); } }
+/* ---------- Супермен: руки и ноги подъём из положения лёжа ---------- */
+.exd-superArm { animation: exd-superArm 2.2s ease-in-out infinite; }
+.exd-superLeg { animation: exd-superLeg 2.2s ease-in-out infinite; }
+@keyframes exd-superArm {
+  0%, 100% { transform: rotate(0); }
+  50% { transform: rotate(-22deg); }
+}
+@keyframes exd-superLeg {
+  0%, 100% { transform: rotate(0); }
+  50% { transform: rotate(22deg); }
+}
 
-/* ---------- Сгибания рук ---------- */
-.exd-curlL { animation: exd-curlL 1.4s ease-in-out infinite; }
-.exd-curlR { animation: exd-curlR 1.4s ease-in-out infinite; animation-delay: -0.7s; }
-@keyframes exd-curlL { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-140deg); } }
-@keyframes exd-curlR { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(140deg); } }
+/* ---------- Сгибания рук: предплечья к плечам ---------- */
+.exd-curlL { animation: exd-curlL 1.5s cubic-bezier(.4,.05,.6,.95) infinite; }
+.exd-curlR { animation: exd-curlR 1.5s cubic-bezier(.4,.05,.6,.95) infinite; animation-delay: -0.75s; }
+@keyframes exd-curlL { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-135deg); } }
+@keyframes exd-curlR { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(135deg); } }
 
 /* ---------- Подъёмы рук через стороны ---------- */
-.exd-raiseL { animation: exd-raiseL 1.6s ease-in-out infinite; }
-.exd-raiseR { animation: exd-raiseR 1.6s ease-in-out infinite; }
-@keyframes exd-raiseL { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(45deg); } }
-@keyframes exd-raiseR { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-45deg); } }
+.exd-raiseL { animation: exd-raiseL 1.7s ease-in-out infinite; }
+.exd-raiseR { animation: exd-raiseR 1.7s ease-in-out infinite; }
+@keyframes exd-raiseL { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(48deg); } }
+@keyframes exd-raiseR { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-48deg); } }
 
-/* ---------- Общая фигурка (подскок) ---------- */
-.exd-bounce { animation: exd-bounce 1.2s ease-in-out infinite; }
-@keyframes exd-bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
-.exdemo--generic .exd-shadow { animation: exd-shadowPulse 1.2s ease-in-out infinite; }
-@keyframes exd-shadowPulse {
-  0%, 100% { transform: scale(1); opacity: 0.12; }
-  50% { transform: scale(0.78); opacity: 0.07; }
+/* ---------- Общая фигурка: бодрый подскок + мах руками ---------- */
+.exd-bounce { animation: exd-bounce 1.2s ease-in-out infinite; transform-box: view-box; transform-origin: 60px 108px; }
+.exd-bounceArmL { animation: exd-bounceArmL 1.2s ease-in-out infinite; }
+.exd-bounceArmR { animation: exd-bounceArmR 1.2s ease-in-out infinite; }
+@keyframes exd-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
 }
+@keyframes exd-bounceArmL { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(30deg); } }
+@keyframes exd-bounceArmR { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-30deg); } }
 
 /* ---------- Карточки упражнений ---------- */
 .ex-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 0.9rem;
+  gap: 1rem;
   margin: 1rem 0;
 }
 .ex-card {
-  background: var(--bg);
+  position: relative;
+  background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 0.9rem;
+  border-radius: 14px;
+  padding: 1rem;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+  gap: 0.55rem;
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.25s;
   animation: exd-cardIn 0.45s ease both;
+  overflow: hidden;
 }
+.ex-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(90% 60% at 50% 100%, color-mix(in srgb, var(--accent-2) 12%, transparent), transparent 65%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+.ex-card:hover::before { opacity: 1; }
 .ex-card:hover {
-  transform: translateY(-3px);
-  border-color: var(--accent);
-  box-shadow: 0 8px 22px -12px color-mix(in srgb, var(--accent) 60%, transparent);
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+  box-shadow: var(--glow);
 }
 .ex-anim-wrap {
+  position: relative;
   width: 100%;
-  max-width: 120px;
+  max-width: 130px;
   aspect-ratio: 1;
   margin: 0 auto;
+  background: radial-gradient(70% 70% at 50% 55%, color-mix(in srgb, var(--accent-2) 12%, transparent), transparent 70%);
+  border-radius: 12px;
 }
-.ex-card-name { font-weight: 600; font-size: 0.95rem; line-height: 1.3; }
-.ex-badges { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.ex-card-name { font-weight: 700; font-size: 0.98rem; line-height: 1.3; position: relative; }
+.ex-badges { display: flex; flex-wrap: wrap; gap: 0.35rem; position: relative; }
 .ex-badge {
-  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
   color: var(--accent);
   border-radius: 999px;
-  padding: 0.15rem 0.6rem;
+  padding: 0.2rem 0.7rem;
   font-size: 0.78rem;
-  font-weight: 600;
+  font-weight: 700;
   white-space: nowrap;
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent);
 }
-.ex-card-desc { color: var(--muted); font-size: 0.83rem; line-height: 1.45; margin: 0; }
+.ex-card-desc { color: var(--muted); font-size: 0.85rem; line-height: 1.5; margin: 0; position: relative; }
 
 @keyframes exd-cardIn {
   from { opacity: 0; transform: translateY(10px); }
