@@ -188,6 +188,37 @@
 @keyframes exd-bounceArmL { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(30deg); } }
 @keyframes exd-bounceArmR { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-30deg); } }
 
+/* ---------- Фото-анимация (2 кадра crossfade) ---------- */
+.exanim {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 12px;
+  background:
+    radial-gradient(70% 70% at 50% 55%, color-mix(in srgb, var(--accent-2) 14%, transparent), transparent 70%),
+    color-mix(in srgb, var(--card) 92%, var(--accent) 8%);
+}
+.exanim-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 4px;
+  will-change: opacity;
+}
+/* Кадр A всегда виден, кадр B пульсирует поверх — итог: имитация «туда-обратно». */
+.exanim-photo--a { opacity: 1; }
+.exanim-photo--b {
+  opacity: 0;
+  animation: exanim-crossfade 1.8s ease-in-out infinite alternate;
+}
+@keyframes exanim-crossfade {
+  0%, 15% { opacity: 0; }
+  50%, 100% { opacity: 1; }
+}
+
 /* ---------- Карточки упражнений ---------- */
 .ex-grid {
   display: grid;
@@ -226,12 +257,12 @@
 .ex-anim-wrap {
   position: relative;
   width: 100%;
-  max-width: 130px;
+  max-width: 160px;
   aspect-ratio: 1;
   margin: 0 auto;
-  background: radial-gradient(70% 70% at 50% 55%, color-mix(in srgb, var(--accent-2) 12%, transparent), transparent 70%);
-  border-radius: 12px;
 }
+/* Фото уже с собственным фоном — убираем задник у контейнера. */
+.ex-anim-wrap > .exanim { max-width: 100%; }
 .ex-card-name { font-weight: 700; font-size: 0.98rem; line-height: 1.3; position: relative; }
 .ex-badges { display: flex; flex-wrap: wrap; gap: 0.35rem; position: relative; }
 .ex-badge {
